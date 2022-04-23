@@ -9,4 +9,12 @@ navbar:
       href: index.html
     - text: "About"
       href: about.html
+  left:
+    - text: "DataViz Makeover"
+      menu:
+      - text: "DataViz Makeover1"
+        href: "dataviz1"
+      - text: "DataViz Makeover2"
+        href: "dataviz2"
+    - text: "Take Home Exercise"
 output: distill::distill_article

@@ -1,0 +1,33 @@
+---
+title: "takehome_ex01"
+output: html_document
+date: '2022-04-23'
+site: distill::distill_website
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      eval= TRUE,
+                      warning=FALSE,
+                      message=FALSE)
+```
+
+```{r echo=FALSE}
+packages = c('tidyverse')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+```
+
+#importing data
+```{r echo=TRUE}
+participant_data <- read_csv("data/Participants.csv")
+```
+
+
+#
+
