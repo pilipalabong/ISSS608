@@ -78,6 +78,9 @@ kable(participant)
 ```
 
 # A diverging stacked bar chart
+
+The code chunk below plot the diverging stacked by using likert.
+
 ```{r fig.align="center",fig.width= 11,fig.height= 11}
 likert(Type ~ . | Subtable, data = participant, as.percent = TRUE, positive.order = TRUE, 
        scales = list(y = list(relation = "free")), layout = c(1, 6))
