@@ -1,0 +1,138 @@
+---
+title: "Take Home Exercise 2"
+author: 
+  - name: JUNQIU NI
+    affiliation: MITB
+description:
+  In this Take Home Exercise, I will explore the demographic of the city of Engagement, Ohio USA.Creating data visualisation beyond default select one of the Take-home Exercise01 prepared by your classmate, critic the submission in terms of clarity and aesthetics, and remake the original design by using the data visualisation principles and best practic.
+date: '2022-05-01'
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      eval= TRUE,
+                      warning=FALSE,
+                      message=FALSE)
+```
+
+# 1. Overview
+
+
+In this take home exercise, I will reveal the demographic of the city of Engagement, Ohio USA by using a patchwork of pie charts to visualize the distribution of participants and a Diverging stacked bar chart to visualize the joviality across different groups of participants.
+
+# 2
+
+# 2.1 Loading r packages
+
+Before we get started, it is important to ensure that the R packages have been installed.  If yes, we will load the R packages. If they have yet to be installed, we will install the R packages and load them onto R environment.
+
+The chunk code below will do the trick.
+
+```{r}
+packages = c('tidyverse',"HH","vcd",'knitr','ggdist', 'ggridges',
+             'patchwork', 'ggthemes', 'hrbrthemes',
+             'ggrepel', 'ggforce','viridis')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+```
+
+# 2.2. Importing Data
+
+The code chunk below import "Participants.csv" from the data folder into R by using [`read_csv()`](https://readr.tidyverse.org/reference/read_delim.html) of [**readr**](https://readr.tidyverse.org/index.html) and save it as an tibble data frame called "participant_data".
+
+```{r echo=TRUE}
+participant_data <- read_csv("data/Participants.csv")
+```
+
+# 3. Review and Remake of Peer Work
+
+I will review [**my peer's  work**](https://visualanalytics.netlify.app/th_ex/th_ex1.html). This exercise uses `tidyverse` and `ggplot2`  to reveal the demographic of the city of Engagement, Ohio USA. 
+
+# 3.1 Review of Peer's Work
+
+The exercise explores the distribution of joviality using histogram chart.
+It also group the data using age so it can explore the distribution for participants with different age. The Joviality Measure figure in terms of education level and interest group is not clear to show the distribution of joviality and suggest no obvious pattern in terms of age. So we can see the distribution of joviality in terms of education level and interest group without grouping the data into different age levels.
+
+
+# 3.2 A Boxplot of joviality
+
+I first see the distribution of joviality using a box plot.
+
+```{r}
+ggplot(participant_data,aes(y=joviality)) +
+    geom_boxplot()
+```
+
+# 3.3 Boxplot of Joviality With Different Education Level
+The pattern of joviality is still un clear with the box plot above. We can explore the joviality distribution by education level.
+
+```{r echo=TRUE}
+
+ggplot(participant_data,aes(x=educationLevel,y=joviality)) +
+    geom_boxplot()+
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9)
+```
+```{r echo=TRUE}
+
+ggplot(participant_data,aes(x=educationLevel,y=joviality,fill=educationLevel)) +
+    geom_boxplot()+
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9)+
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("A boxplot of Joviality With Different Education Level") +
+    xlab("")
+```
+# 3.4 Violin Chart of Joviality With Different Education Level
+
+
+```{r}
+ggplot(participant_data,aes(x=educationLevel,y=joviality,fill=educationLevel)) +
+    geom_violin()+
+    scale_fill_viridis(discrete = TRUE, alpha=0.6, option="A") +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Violin chart of Joviality With Different Education Level") +
+    xlab("")
+
+```  
+# 3.5 Box Plot of Joviality With Different Interest Groups
+
+```{r echo=TRUE}
+
+ggplot(participant_data,aes(x=interestGroup,y=joviality)) +
+    geom_boxplot()+
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9)
+```
+
+# 3.5 Violin Plot of Joviality With Different Interest Groups
+
+```{r}
+ggplot(participant_data,aes(x=interestGroup,y=joviality,fill=interestGroup)) +
+    geom_violin()+
+    scale_fill_viridis(discrete = TRUE, alpha=0.6, option="A") +
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Violin chart of Joviality With Different Interest Groups") +
+    xlab("")
+```  
+
+
