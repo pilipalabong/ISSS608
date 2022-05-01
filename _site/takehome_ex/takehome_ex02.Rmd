@@ -5,8 +5,6 @@ author:
     affiliation: MITB
 description:
   Creating data visualisation beyond default
-  
-  In this take home exercise, I will select one of the Take-home Exercise1 prepared by one of my classmates in terms of the demographic of the city of Engagement, Ohio USA, critic the submission in terms of clarity and aesthetics, and remake the original design by using the data visualisation principles and best practic.
 date: '2022-05-01'
 output: distill::distill_article
 ---
@@ -21,19 +19,19 @@ knitr::opts_chunk$set(echo = TRUE,
 # 1. Overview
 
 
-In this take home exercise, I will review[**the take home exercise 1 of one of  my classmates **](https://visualanalytics.netlify.app/th_ex/th_ex1.html) about the demographic of the city of Engagement, Ohio USA and remake the original design.
+In this take home exercise, I will review [**take home exercise 1 of one of  my classmates**](https://visualanalytics.netlify.app/th_ex/th_ex1.html) about the demographic of the city of Engagement, Ohio USA in terms of clarity and aesthetics and remake the original design by using the data visualisation principles and best practic.
 
-# 2 Getting Started
+# 2. Getting Started
 
-# 2.1 Loading r packages
+# 2.1 Loading R packages
 
 Before we get started, it is important to ensure that the R packages have been installed.  If yes, we will load the R packages. If they have yet to be installed, we will install the R packages and load them onto R environment.
 
 The chunk code below will do the trick.
 
 ```{r}
-packages = c('tidyverse',"HH","vcd",'knitr','ggdist', 'ggridges',
-             'patchwork', 'ggthemes', 'hrbrthemes',
+packages = c('tidyverse','knitr','ggdist', 'ggridges',
+             'ggthemes', 'hrbrthemes',
              'ggrepel', 'ggforce','viridis')
 
 for(p in packages){
@@ -65,7 +63,7 @@ It also group the data using age so it can explore the distribution for particip
 
 # 3.2 A Boxplot of joviality
 
-I first see the distribution of joviality using a box plot.
+I first see the distribution of joviality using a box plot. 
 
 ```{r}
 ggplot(participant_data,aes(y=joviality)) +
@@ -73,21 +71,24 @@ ggplot(participant_data,aes(y=joviality)) +
 ```
 
 # 3.3 Boxplot of Joviality With Different Education Level
-The pattern of joviality is still un clear with the box plot above. We can explore the joviality distribution by education level.
+
+The pattern of joviality is still unclear with the box plot above. The box plot can summarize the distribution of joviality but the problem is that summarizing also means losing information. As a result, I would like to show the data points on the box plots to make the graph more insightful by adding jitter using `geom_point(position="jitter")`. We can explore the joviality distribution by education level.
 
 ```{r echo=TRUE}
 
 ggplot(participant_data,aes(x=educationLevel,y=joviality)) +
     geom_boxplot()+
-    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
-    geom_jitter(color="black", size=0.4, alpha=0.9)
+    geom_point(position="jitter",size = 0.5)
+    
 ```
+I will also use `theme_ipsum()` and add the title to make the graph easier to read.
+
 ```{r echo=TRUE}
 
 ggplot(participant_data,aes(x=educationLevel,y=joviality,fill=educationLevel)) +
     geom_boxplot()+
+    geom_point(position="jitter",size = 0.5)+
     scale_fill_viridis(discrete = TRUE, alpha=0.6) +
-    geom_jitter(color="black", size=0.4, alpha=0.9)+
     theme_ipsum() +
     theme(
       legend.position="none",
@@ -98,6 +99,7 @@ ggplot(participant_data,aes(x=educationLevel,y=joviality,fill=educationLevel)) +
 ```
 # 3.4 Violin Chart of Joviality With Different Education Level
 
+I will also use violin chart to interpret the distribution of joviality using `geom_violin()`.
 
 ```{r}
 ggplot(participant_data,aes(x=educationLevel,y=joviality,fill=educationLevel)) +
@@ -114,13 +116,8 @@ ggplot(participant_data,aes(x=educationLevel,y=joviality,fill=educationLevel)) +
 ```  
 # 3.5 Box Plot of Joviality With Different Interest Groups
 
-```{r echo=TRUE}
+We can do the similar analysis to different interest groups.
 
-ggplot(participant_data,aes(x=interestGroup,y=joviality)) +
-    geom_boxplot()+
-    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
-    geom_jitter(color="black", size=0.4, alpha=0.9)
-```
 ```{r echo=TRUE}
 
 ggplot(participant_data,aes(x=interestGroup,y=joviality,fill=interestGroup)) +
@@ -150,5 +147,7 @@ ggplot(participant_data,aes(x=interestGroup,y=joviality,fill=interestGroup)) +
     ggtitle("Violin chart of Joviality With Different Interest Groups") +
     xlab("")
 ```  
+# 4. Analysis and Insight
 
+According to the result from part 3, we can conclude that participants with bachelor or low education level are tend to be in the mode of either happy or unhappy and there is a possibility that more of them may feel unhappy. Participants whose interest group is C or E are more likely to feel happy that those in other interest group.
 
