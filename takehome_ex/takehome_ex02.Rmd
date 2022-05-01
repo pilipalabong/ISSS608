@@ -4,7 +4,9 @@ author:
   - name: JUNQIU NI
     affiliation: MITB
 description:
-  In this Take Home Exercise, I will explore the demographic of the city of Engagement, Ohio USA.Creating data visualisation beyond default select one of the Take-home Exercise01 prepared by your classmate, critic the submission in terms of clarity and aesthetics, and remake the original design by using the data visualisation principles and best practic.
+  Creating data visualisation beyond default
+  
+  In this take home exercise, I will select one of the Take-home Exercise1 prepared by one of my classmates in terms of the demographic of the city of Engagement, Ohio USA, critic the submission in terms of clarity and aesthetics, and remake the original design by using the data visualisation principles and best practic.
 date: '2022-05-01'
 output: distill::distill_article
 ---
@@ -19,9 +21,9 @@ knitr::opts_chunk$set(echo = TRUE,
 # 1. Overview
 
 
-In this take home exercise, I will reveal the demographic of the city of Engagement, Ohio USA by using a patchwork of pie charts to visualize the distribution of participants and a Diverging stacked bar chart to visualize the joviality across different groups of participants.
+In this take home exercise, I will review[**the take home exercise 1 of one of  my classmates **](https://visualanalytics.netlify.app/th_ex/th_ex1.html) about the demographic of the city of Engagement, Ohio USA and remake the original design.
 
-# 2
+# 2 Getting Started
 
 # 2.1 Loading r packages
 
@@ -118,6 +120,20 @@ ggplot(participant_data,aes(x=interestGroup,y=joviality)) +
     geom_boxplot()+
     scale_fill_viridis(discrete = TRUE, alpha=0.6) +
     geom_jitter(color="black", size=0.4, alpha=0.9)
+```
+```{r echo=TRUE}
+
+ggplot(participant_data,aes(x=interestGroup,y=joviality,fill=interestGroup)) +
+    geom_boxplot()+
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9)+
+    theme_ipsum() +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("A boxplot of Joviality With Different Education Level") +
+    xlab("")
 ```
 
 # 3.5 Violin Plot of Joviality With Different Interest Groups
