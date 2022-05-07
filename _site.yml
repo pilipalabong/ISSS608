@@ -22,4 +22,8 @@ navbar:
         href: "takehome_ex/takehome_ex01.html"
       - text: "Take Home Exercise2"
         href: "takehome_ex/takehome_ex02.html"
+    - text: "In Class Exercise"
+      menu:
+      - text: "In Class Exercise4"
+        href: "in_class_ex/inclass_ex_4.html"
 output: distill::distill_article
