@@ -1,0 +1,263 @@
+---
+title: "Take Home Exercise 6"
+author: 
+  - name: JUNQIU NI
+    affiliation: MITB
+description:
+    Model, analyse and visualise network data using R.
+date: '2022-06-05'
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      eval= TRUE,
+                      warning=FALSE,
+                      message=FALSE)
+```
+
+# 1. Overview
+
+In this take home exercise, I will reveal the patterns of community interactions of the city of Engagement, Ohio USA by using social network analysis approach.
+
+# 2. Setting Up
+
+# 2.1 Loading R packages
+
+Before we get started, it is important to ensure that the R packages have been installed.  If yes, we will load the R packages. If they have yet to be installed, we will install the R packages and load them onto R environment.
+
+The chunk code below will do the trick.
+
+```{r}
+packages = c('igraph', 'tidygraph', 
+             'ggraph', 'visNetwork', 
+             'lubridate', 'clock',
+             'tidyverse', 'ggmap','zoo')
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+```
+
+# 2.2. Importing Data
+
+```{r}
+network_nodes <- read_csv("data/Participants.csv")
+network_edges <- read_csv("data/SocialNetwork.csv")
+```
+
+# View the data
+
+```{r}
+glimpse(network_edges)
+```
+
+
+# 2.3 Data Preprocessing
+
+## Change the participantId to make the node start from 1 instead of 0
+
+```{r}
+network_nodes <- network_nodes %>%
+  mutate(participantId = participantId +1)
+
+network_edges <- network_edges %>%
+  mutate(source = source +1) %>%
+  mutate(target =  target +1)
+```
+
+## Add the year month value
+
+```{r}
+network_edges <- network_edges %>%
+  mutate(Weekday = wday(timestamp,
+                        label = TRUE,
+                        abbr = FALSE)) %>%
+  mutate(YearMonth = format(timestamp,'%Y-%m'))
+```
+
+## Choose one month data and observe the distribution of number of interactions of participants
+
+```{r}
+network_edges_aggregated <- network_edges %>%
+  filter(YearMonth == "2022-03") %>%
+  group_by(source, target) %>%
+  summarise(Weight = n()) %>%
+  filter(source!=target) %>%
+  ungroup()
+
+hist(network_edges_aggregated$Weight)
+summary(network_edges_aggregated$Weight)
+
+```
+From the distribution shown above, we can choose the interactions of more than 20 as close relationship of participants.
+
+## Select nodes and edges that have more than weight of 20
+
+```{r}
+network_edges_aggregated <- network_edges %>%
+  filter(YearMonth == "2022-03") %>%
+  group_by(source, target) %>%
+  summarise(Weight = n()) %>%
+  filter(source!=target) %>%
+  filter(Weight > 20) %>%
+  ungroup() %>% 
+  mutate_at(vars(source, target), as.character)
+nodes <-c(network_edges_aggregated$source,network_edges_aggregated$target)
+nodes <- data.frame(participantId=unlist(nodes, use.names = FALSE))
+nodes <- distinct(nodes, participantId)
+network_nodes <- merge(x=network_nodes,y=nodes,by="participantId") %>% 
+  mutate(participantId = as.character(participantId))
+#nodes <- subset(network_edges_aggregated,select=c(source))
+```
+
+# 2.4 Create network graph using tbl_graph()
+
+```{r}
+network_graph <- tbl_graph(nodes = network_nodes,
+                           edges = network_edges_aggregated, 
+                           directed = TRUE)
+```
+
+```{r}
+network_graph
+```
+
+```{r}
+network_graph %>%
+  activate(edges) %>%
+  arrange(desc(Weight))
+```
+
+# 3. Visualizing the network graph
+
+## 3.1 Plot network graph using ggraph
+
+```{r}
+g <- ggraph(network_graph) + 
+  geom_edge_link(aes()) +
+  geom_node_point(aes())+
+  labs(title = "Network of Engagemnet")
+g + theme_graph()
+```
+
+
+## 3.2 Plot network graph using ggraph with different Education Level
+
+```{r}
+g <- ggraph(network_graph, 
+            layout = "nicely") + 
+  geom_edge_link(aes()) +
+  geom_node_point(aes(colour = educationLevel, 
+                      size = 1))+
+  labs(title = "Network of Engagemnet with different Education Level")
+g + theme_graph()
+```
+
+
+```{r}
+g <- ggraph(network_graph, 
+            layout = "nicely") +
+  geom_edge_link(aes(width=Weight), 
+                 alpha=0.2) +
+  scale_edge_width(range = c(0.1, 5)) +
+  geom_node_point(aes(colour = educationLevel), 
+                  size = 1)+
+  labs(title = "Network of Engagemnet with different Education Level")
+g + theme_graph()
+```
+
+
+
+## 3.3 Plot network graph using ggraph separately of different Education Levels
+
+```{r}
+set_graph_style()
+g <- ggraph(network_graph, 
+            layout = "nicely") + 
+  geom_edge_link(aes(width=Weight), 
+                 alpha=0.2) +
+  scale_edge_width(range = c(0.1, 5)) +
+  geom_node_point(aes(colour = educationLevel), 
+                  size = 2)+
+  labs(title = "Network of Engagemnet")
+g + facet_nodes(~educationLevel)+
+  th_foreground(foreground = "grey80",  
+                border = TRUE) +
+  theme(legend.position = 'bottom')
+```
+
+## 3.4 network graph with network measures of betweenness centrality
+
+```{r fig.height=7}
+g <- network_graph %>%
+  mutate(betweenness_centrality = centrality_betweenness()) %>%
+  ggraph(layout = "fr") + 
+  geom_edge_link(aes(width=Weight), 
+                 alpha=0.2) +
+  scale_edge_width(range = c(0.1, 5)) +
+  geom_node_point(aes(colour = educationLevel,
+            size=betweenness_centrality))+
+  labs(title = "Network of Engagemnet with betweenness centrality")
+g + theme_graph()
+```
+
+
+```{r fig.height=7}
+g <- network_graph %>%
+  ggraph(layout = "fr") + 
+  geom_edge_link(aes(width=Weight), 
+                 alpha=0.2) +
+  scale_edge_width(range = c(0.1, 5)) +
+  geom_node_point(aes(colour = educationLevel, 
+                      size = centrality_betweenness()))+
+  labs(title = "Network of Engagemnet with betweenness centrality")
+g + theme_graph()
+```
+
+## 3.5 Visualising Community
+
+```{r fig.height=7}
+g <- network_graph %>%
+  mutate(community = as.factor(group_edge_betweenness(weights = Weight, directed = TRUE))) %>%
+  ggraph(layout = "fr") + 
+  geom_edge_link(aes(width=Weight), 
+                 alpha=0.2) +
+  scale_edge_width(range = c(0.1, 5)) +
+  geom_node_point(aes(colour = community))
+g + theme_graph()+
+  labs(title = "Network of Engagemnet with community")  
+```
+## 3.6 Insights
+
+From the plots shown above, we can conclude that participants with low education level tend to have less interactions with other participants. People with bachelor degree or High school degree are more likely to have higher betweenness centrality.
+
+# 4. Interactive Network Graph with visNetwork
+
+Processing the data
+
+```{r}
+network_edges_aggregated <- network_edges %>%
+  mutate(source = as.character(source))  %>% 
+  mutate(target = as.character(target))  %>% 
+  left_join(network_nodes, by = c("source" = "participantId")) %>%
+  left_join(network_nodes, by = c("target" = "participantId")) %>%
+  filter(YearMonth == "2022-03") %>%
+  group_by(source, target) %>%
+    summarise(weight = n()) %>%
+  filter(source!=target) %>%
+  filter(weight > 10) %>%
+  ungroup()
+```
+
+
+To show the network graph interactively, we can use visNetwork. In this case the number of nodes is still too big to clearly show the network interactively. We can select some of the nodes and show their network in further steps.
+
+```{r}
+visNetwork(network_nodes, 
+          network_edges_aggregated)
+```
+
+
